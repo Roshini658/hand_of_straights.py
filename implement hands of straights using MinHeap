@@ -1,0 +1,50 @@
+class Solution:
+    def isNStraightHand(self, hand, groupSize):
+
+        # Total number of cards must be divisible by groupSize
+        if len(hand) % groupSize != 0:
+            return False
+
+        # Count how many times each card appears
+        from collections import Counter
+        count = Counter(hand)
+
+        # Import heap functions
+        import heapq
+
+        # Create a min heap
+        heap = []
+
+        # Put every different card into the min heap
+        for card in count:
+            heapq.heappush(heap, card)
+
+        # Continue while there are cards in the heap
+        while heap:
+
+            # Remove card values from heap if all their copies are already used
+            while heap and count[heap[0]] == 0:
+                heapq.heappop(heap)
+
+            # If heap became empty, all cards are used
+            if not heap:
+                return True
+
+            # Smallest unused card must start the next group
+            first = heap[0]
+
+            # Find how many groups must start with this card
+            frequency = count[first]
+
+            # Create consecutive cards for all these groups
+            for value in range(first, first + groupSize):
+
+                # We need 'frequency' copies of this value
+                if count.get(value, 0) < frequency:
+                    return False
+
+                # Use those cards
+                count[value] -= frequency
+
+        # All cards were successfully grouped
+        return True
